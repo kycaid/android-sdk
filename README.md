@@ -12,6 +12,7 @@
     - [Additional configuration](#additional-configuration)
 * [Localization](#localization)
 * [TODO](#todo)
+* [Limitations](#limitations)
 * [Links](#links)
 
 ## Requirements
@@ -114,6 +115,12 @@ builder
 * Add example project
 * Support Activity Result API
 * Color configuration explanation
+* Fix limitations
+
+## Limitations
+
+* ```KycaidResult.Success``` have ```null``` applicantId when verify via Bank ID
+* You can update existing document's images but cannot add new ones if start verification with existing applicant id.
 
 ## Links
 
