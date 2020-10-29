@@ -42,7 +42,7 @@ where x.y.z - latest version that can be checked in Releases section of Github.
 ### Setup SDK
 
 First of all, you should add ```KycaidActivity``` to app's Manifest.xml  file.
-Place the following under <application> tag of your Manifest.xml:
+Place the following under <application /> tag of your Manifest.xml:
 ```xml
 <activity android:name="com.kycaid.sdk.ui.KycaidActivity" />
 ```
