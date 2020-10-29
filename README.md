@@ -1,4 +1,4 @@
-# Kycaid Android SDK
+# Oficcial KYCAID Android SDK
 
 ![GitHub Logo](/art/logo_new_entry.png).
 
@@ -39,7 +39,7 @@ where x.y.z - latest version that can be checked in Releases section of Github.
 
 ## Usage
 
-###Setup SDK
+### Setup SDK
 
 First of all, you should add ```KycaidActivity``` to app's Manifest.xml  file.
 Place the following under <application> tag of your Manifest.xml:
@@ -52,14 +52,14 @@ You can can initialize Kycaid SDK flow via ```KycaidIntent``` class. It has inne
 val builder = KycaidIntent.Builder(<API Token>, <From Id>).build()
 ```
 
-###Run verification flow
+### Run verification flow
 
 Once you created ```Builder``` object via ```build``` method you can start verification flow using ```startActivityForResult``` method and pass your ```Activity``` of ```Fragment``` class as parameter.
 ```kotlin
 builder.startActivityForResult(<Activity or Fragment instance>)
 ```
 
-###Handle verification result
+### Handle verification result
 
 To handle result from SDK you should override ```onActivityResult``` method in your Activity/Fragment class. The result could be obtained via static ```onActivityResult``` method of ```KycaidIntent``` class.
 ```kotlin
