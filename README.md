@@ -9,6 +9,7 @@
     - [Setup SDK](#setup-sdk)
     - [Run verification flow](#run-verification-flow)
     - [Handle verification Result](#handle-verification-result)
+    - [Additional configuration](#additional-configuration)
 * [Localization](#localization)
 * [TODO](#todo)
 * [Links](#links)
@@ -81,6 +82,25 @@ const val KYCAID_ERROR_FORM_ID_MISSING = 10
 const val KYCAID_ERROR_API_TOKEN_MISSING = 11
 const val KYCAID_ERROR_NOT_VALID_REQUEST = 12
 const val KYCAID_ERROR_FAILED_TO_CREATE_VERIFICATION = 13
+```
+
+### Additional configuration
+
+You can apply additional configurations to SDK via ```Builder``` class. For example, you can pass callback url or pass an existing applicant id to update some information.
+```kotlin
+val builder = KycaidIntent.Builder(<API Token>, <From Id>)
+    .callbackUrl("https://some-url.com")
+    .applicantId(<Applicant Id>)
+.build()
+```
+You can specify a huge amount of color configurations for UI elements of SDK, there are some of them:
+```kotlin
+builder
+    .backgroundColor(Color.GRAY)
+    .colorPrimary(Color.YELLOW)
+    .textColorPrimary(Color.BLUE)
+    .textColorSecondary(Color.CYAN)
+    .buttonTextColor(Color.BLACK)
 ```
 
 ## Localization
