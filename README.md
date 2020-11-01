@@ -20,7 +20,7 @@
 * Android API level 21+
 
 ## Integration
-To use Kycaid SDK you should do two simple steps:
+To use Kycaid SDK you should do three simple steps:
 1. Add maven repository under your allprojects closure in project's build.gradle file:
 ```gradle
 allprojects {
@@ -39,6 +39,16 @@ implementation('com.kycaid:kycaid-sdk:x.y.z')
 ```
 where x.y.z - latest version that can be checked in Releases section of Github.
 
+3. Kycaid SDK requires at minimum Java 8+, so you need to add following lines to your module's build.gradle file under ```android``` closure:
+```gradle
+compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
+}
+kotlinOptions {
+    jvmTarget = '1.8'
+}
+```
 ## Usage
 
 ### Setup SDK
