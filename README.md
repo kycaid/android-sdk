@@ -61,7 +61,7 @@ Place the following under application tag of your Manifest.xml:
 
 You can can initialize Kycaid SDK flow via ```KycaidIntent``` class. It has inner ```Builder``` class for additional configuration of appearance of the SDK. ```Builder``` constructor has two arguments: ```apiToken``` and ```formId``` - both of them should be obtained from your dashboard.
 ```kotlin
-val builder = KycaidIntent.Builder(<API Token>, <From Id>).build()
+val builder = KycaidIntent.Builder(<API Token>, <Form Id>).build()
 ```
 
 ### Run verification flow
@@ -99,7 +99,7 @@ const val KYCAID_ERROR_FAILED_TO_CREATE_VERIFICATION = 13
 
 You can apply additional configurations to SDK via ```Builder``` class. For example, you can pass callback url or pass an existing applicant id to update some information.
 ```kotlin
-val builder = KycaidIntent.Builder(<API Token>, <From Id>)
+val builder = KycaidIntent.Builder(<API Token>, <Form Id>)
     .callbackUrl("https://some-url.com")
     .applicantId(<Applicant Id>)
 .build()
