@@ -129,7 +129,6 @@ builder
 
 ## Limitations
 
-* ```KycaidResult.Success``` have ```null``` applicantId when verify via Bank ID
 * You can update existing document's images but cannot add new ones if start verification with existing applicant id.
 
 ## Links
