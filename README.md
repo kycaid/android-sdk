@@ -93,7 +93,24 @@ const val KYCAID_ERROR_FORM_ID_MISSING = 10
 const val KYCAID_ERROR_API_TOKEN_MISSING = 11
 const val KYCAID_ERROR_NOT_VALID_REQUEST = 12
 const val KYCAID_ERROR_FAILED_TO_CREATE_VERIFICATION = 13
+const val KYCAID_ERROR_UNAUTHORIZED = 14
+const val KYCAID_ERROR_INACTIVE_ACCOUNT = 15
+const val KYCAID_ERROR_INSUFFICIENT_FUNDS = 16
+const val KYCAID_ERROR_NOT_FOUND = 17
+const val KYCAID_ERROR_REQUEST_TIMEOUT = 18
+const val KYCAID_ERROR_DUPLICATE_DATA = 19
+const val KYCAID_ERROR_FLOW = 20
+const val KYCAID_ERROR_EDIT_DENIED = 21
+const val KYCAID_ERROR_DELETE_DENIED = 22
+const val KYCAID_ERROR_VALIDATION = 23
+const val KYCAID_ERROR_APPLICANT_EXISTS = 24
+const val KYCAID_ERROR_VERIFICATION_EXISTS = 25
+const val KYCAID_ERROR_INSUFFICIENT_DATA = 26
+const val KYCAID_ERROR_LIMIT_EXCEEDED = 27
+const val KYCAID_ERROR_INTERNAL_SERVER = 28
 ```
+
+You can find explanation of every error in API documentation here: https://docs.kycaid.com/#errors
 
 ### Additional configuration
 
@@ -125,11 +142,6 @@ builder
 * Add example project
 * Support Activity Result API
 * Color configuration explanation
-* Fix limitations
-
-## Limitations
-
-* You can update existing document's images but cannot add new ones if start verification with existing applicant id.
 
 ## Links
 
