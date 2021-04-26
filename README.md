@@ -1,4 +1,4 @@
-# Oficcial KYCAID Android SDK
+# Official KYCAID Android SDK
 
 ![GitHub Logo](/art/logo_new_entry.png).
 
@@ -28,7 +28,8 @@ allprojects {
         google()
         jcenter()
         maven {
-            url  "https://kycaid.bintray.com/maven"
+            allowInsecureProtocol = true
+            url  "http://nexus.kycaid.com:8081/repository/android"
         }
     }
 }
