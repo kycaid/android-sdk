@@ -50,6 +50,9 @@ kotlinOptions {
     jvmTarget = '1.8'
 }
 ```
+
+BE ADVISED!!!
+Kycaid SDK uses Google Play Services so it won't work on devices without them. Also to be able to properly test it on the emulator you should use an emulator with up-to-date Google Services(use proper emulator image with Google Services and Play Store installed). We recommend to use at least Pixel 3 for this purposes.
 ## Usage
 
 ### Setup SDK
@@ -57,12 +60,13 @@ kotlinOptions {
 First of all, you should add ```KycaidActivity``` to app's Manifest.xml  file.
 Place the following under application tag of your Manifest.xml:
 ```xml
-<activity android:name="com.kycaid.sdk.ui.KycaidActivity" />
+ <activity android:name="com.kycaid.sdk.ui.KycaidActivity"
+        android:windowSoftInputMode="adjustResize"/>
 ```
 
 You can can initialize Kycaid SDK flow via ```KycaidIntent``` class. It has inner ```Builder``` class for additional configuration of appearance of the SDK. ```Builder``` constructor has two arguments: ```apiToken``` and ```formId``` - both of them should be obtained from your dashboard.
 ```kotlin
-val builder = KycaidIntent.Builder(<API Token>, <Form Id>).build()
+val builder = KycaidIntent.Builder(/*API Token*/, /*Form Id*/).build()
 ```
 
 ### Run verification flow
@@ -74,6 +78,8 @@ builder.startActivityForResult(<Activity or Fragment instance>)
 
 ### Handle verification result
 
+#### Legacy onActivityResult option
+
 To handle result from SDK you should override ```onActivityResult``` method in your Activity/Fragment class. The result could be obtained via static ```onActivityResult``` method of ```KycaidIntent``` class.
 ```kotlin
 override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -82,11 +88,35 @@ override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) 
         when(result) {
             is KycaidResult.Success -> // obtain verification id and applicant id
             is KycaidResult.Failure -> // handle error
+            is KycaidResult.Cancelled -> // user just closed verification flow
         }
     }
 }
 ```
 
+#### Activity Result API option
+
+First of all you should declare ```ActivityResultLauncher``` at top level of your Activity/Fragment like so:
+```kotlin
+private val verificationLauncher = registerForActivityResult(KycaidIntent.CreateVerification()) { result ->
+    when (result) {
+        is KycaidResult.Success -> // obtain verification id and applicant id
+        is KycaidResult.Failure -> // handle error
+        is KycaidResult.Cancelled -> // user just closed verification flow
+    }
+}
+```
+Then, you can launch verification flow from any method of yours, for example:
+```kotlin
+override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    // blah-blah
+    val intent = KycaidIntent.Builder(/*API Token*/, /*Form Id*/)
+        // KycaidIntent setup
+        .build()
+    verificationLauncher.launch(intent)
+}
+```
 The result of SDK flow is presented via ```KycaidResult``` sealed class. ```KycaidResult.Success``` contains verification id and applicant id in case of successful result, ```KycaidResult.Failure``` contains an error code and optional message explaining the reason error happened.
 There are several error codes that you can check for and handle correspondingly:
 ```kotlin
@@ -141,8 +171,8 @@ builder
 ## TODO
 
 * Add example project
-* Support Activity Result API
 * Color configuration explanation
+* Jetpack Compose support
 
 ## Links
 
