@@ -17,7 +17,7 @@
 
 ## Requirements
 
-* Android API level 21+
+* Android API level 22+
 
 ## Integration
 To use Kycaid SDK you should do three simple steps:
@@ -29,7 +29,7 @@ allprojects {
         jcenter()
         maven {
             allowInsecureProtocol = true
-            url  "http://nexus.kycaid.com:8081/repository/android"
+            url  "http://nexus.kycaid.com/repository/android"
         }
     }
 }
@@ -43,11 +43,11 @@ where x.y.z - latest version that can be checked in Releases section of Github.
 3. Kycaid SDK requires at minimum Java 8+, so you need to add following lines to your module's build.gradle file under ```android``` closure:
 ```gradle
 compileOptions {
-    sourceCompatibility JavaVersion.VERSION_1_8
-    targetCompatibility JavaVersion.VERSION_1_8
+    sourceCompatibility JavaVersion.VERSION_11
+    targetCompatibility JavaVersion.VERSION_11
 }
 kotlinOptions {
-    jvmTarget = '1.8'
+    jvmTarget = JavaVersion.VERSION_11.toString()
 }
 ```
 
@@ -64,9 +64,9 @@ Place the following under application tag of your Manifest.xml:
         android:windowSoftInputMode="adjustResize"/>
 ```
 
-You can can initialize Kycaid SDK flow via ```KycaidIntent``` class. It has inner ```Builder``` class for additional configuration of appearance of the SDK. ```Builder``` constructor has two arguments: ```apiToken``` and ```formId``` - both of them should be obtained from your dashboard.
+You can can initialize Kycaid SDK flow via ```KycaidConfiguration``` class. It has inner ```Builder``` class for additional configuration of appearance of the SDK. ```Builder``` constructor has three arguments: ```apiToken```, ```formId``` and ```customHost``` - first two could be obtained from your dashboard, the third one is used to configure custom host for the api, pass ```null``` if you don't use self hosted api.
 ```kotlin
-val builder = KycaidIntent.Builder(/*API Token*/, /*Form Id*/).build()
+val builder = KycaidConfiguration.Builder(/*API Token*/, /*Form Id*/, /*custom host*/).build()
 ```
 
 ### Run verification flow
@@ -74,6 +74,16 @@ val builder = KycaidIntent.Builder(/*API Token*/, /*Form Id*/).build()
 Once you created ```Builder``` object via ```build``` method you can start verification flow using ```startActivityForResult``` method and pass your ```Activity``` of ```Fragment``` class as parameter.
 ```kotlin
 builder.startActivityForResult(<Activity or Fragment instance>)
+```
+Or use Activity Result Api as following:
+```kotlin
+// Declare result launcher as Activity or Fragment class level property
+private val kycaidSdkLauncher = registerForActivityResult(KycaidConfiguration.CreateVerification()) { kycaidResult ->
+    // Handle result(see below)
+}
+
+// Launch sdk
+kycaidSdkLauncher.launch(/*KycaidConfiguration instance*/)
 ```
 
 ### Handle verification result
@@ -84,7 +94,7 @@ To handle result from SDK you should override ```onActivityResult``` method in y
 ```kotlin
 override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
     super.onActivityResult(requestCode, resultCode, data)
-    KycaidIntent.onActivityResult(requestCode, resultCode, data) { result ->
+    KycaidConfiguration.onActivityResult(requestCode, resultCode, data) { result ->
         when(result) {
             is KycaidResult.Success -> // obtain verification id and applicant id
             is KycaidResult.Failure -> // handle error
@@ -98,7 +108,7 @@ override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) 
 
 First of all you should declare ```ActivityResultLauncher``` at top level of your Activity/Fragment like so:
 ```kotlin
-private val verificationLauncher = registerForActivityResult(KycaidIntent.CreateVerification()) { result ->
+private val kycaidSdkLauncher = registerForActivityResult(KycaidConfiguration.CreateVerification()) { result ->
     when (result) {
         is KycaidResult.Success -> // obtain verification id and applicant id
         is KycaidResult.Failure -> // handle error
@@ -106,17 +116,7 @@ private val verificationLauncher = registerForActivityResult(KycaidIntent.Create
     }
 }
 ```
-Then, you can launch verification flow from any method of yours, for example:
-```kotlin
-override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    // blah-blah
-    val intent = KycaidIntent.Builder(/*API Token*/, /*Form Id*/)
-        // KycaidIntent setup
-        .build()
-    verificationLauncher.launch(intent)
-}
-```
+
 The result of SDK flow is presented via ```KycaidResult``` sealed class. ```KycaidResult.Success``` contains verification id and applicant id in case of successful result, ```KycaidResult.Failure``` contains an error code and optional message explaining the reason error happened.
 There are several error codes that you can check for and handle correspondingly:
 ```kotlin
@@ -145,12 +145,11 @@ You can find explanation of every error in API documentation here: https://docs.
 
 ### Additional configuration
 
-You can apply additional configurations to SDK via ```Builder``` class. For example, you can pass callback url or pass an existing applicant id to update some information.
+You can apply additional configurations to SDK via ```Builder``` class. For example, you can pass an existing applicant id to create verification for existing applicant.
 ```kotlin
-val builder = KycaidIntent.Builder(<API Token>, <Form Id>)
-    .callbackUrl("https://some-url.com")
-    .applicantId(<Applicant Id>)
-.build()
+val builder = KycaidIntent.Builder(/*API Token*/, /*Form Id*/)
+    .applicantId(/*Applicant Id*/)
+    .build()
 ```
 You can specify a huge amount of color configurations for UI elements of SDK, there are some of them:
 ```kotlin
@@ -159,7 +158,7 @@ builder
     .colorPrimary(Color.YELLOW)
     .textColorPrimary(Color.BLUE)
     .textColorSecondary(Color.CYAN)
-    .buttonTextColor(Color.BLACK)
+    // etc
 ```
 
 ## Localization
@@ -167,11 +166,12 @@ builder
 * English
 * Ukrainian
 * Russian
+* Kazakh
 
 ## TODO
 
 * Add example project
-* Color configuration explanation
+* Color configuration tutorial
 * Jetpack Compose support
 
 ## Links
