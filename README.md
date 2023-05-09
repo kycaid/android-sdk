@@ -38,7 +38,7 @@ allprojects {
 ```gradle
 implementation('com.kycaid:kycaid-sdk:x.y.z')
 ```
-where x.y.z - latest version that can be checked in Releases section of Github.
+where x.y.z - latest version that can be checked in [Releases](https://github.com/kycaid/android-sdk/releases) section of Github.
 
 3. Kycaid SDK requires at minimum Java 8+, so you need to add following lines to your module's build.gradle file under ```android``` closure:
 ```gradle
