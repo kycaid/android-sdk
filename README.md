@@ -1,6 +1,6 @@
 # Official KYCAID Android SDK
 
-![GitHub Logo](/art/logo_new_entry.png).
+![GitHub Logo](/art/logo_new_entry.png)
 
 ## Contents
 
@@ -11,36 +11,38 @@
     - [Handle verification Result](#handle-verification-result)
     - [Additional configuration](#additional-configuration)
 * [Localization](#localization)
-* [TODO](#todo)
-* [Limitations](#limitations)
 * [Links](#links)
 
 ## Requirements
 
-* Android API level 22+
+* Android API level 23+
+* Java version 11+
 
 ## Integration
 To use Kycaid SDK you should do three simple steps:
-1. Add maven repository under your allprojects closure in project's build.gradle file:
+1. Add maven repository to your `allprojects` closure in project's build.gradle file:
 ```gradle
 allprojects {
     repositories {
         google()
-        jcenter()
-        maven {
-            allowInsecureProtocol = true
-            url  "http://nexus.kycaid.com/repository/android"
-        }
+        mavenCentral()
+        maven { url "https://nexus.kycaid.com/repository/android" }
     }
 }
 ```
+or
+```Kotlin
+maven(url = "https://nexus.kycaid.com/repository/android")
+```
+for Kotlin DSL.
+
 2. Add dependency to module's build.gradle file:
 ```gradle
 implementation('com.kycaid:kycaid-sdk:x.y.z')
 ```
 where x.y.z - latest version that can be checked in [Releases](https://github.com/kycaid/android-sdk/releases) section of Github.
 
-3. Kycaid SDK requires at minimum Java 11+, so you need to add following lines to your module's build.gradle file under ```android``` closure:
+3. Kycaid SDK requires at minimum Java 11+, so you need to add following lines to your module's build.gradle file to `android` closure:
 ```gradle
 compileOptions {
     sourceCompatibility JavaVersion.VERSION_11
@@ -51,39 +53,33 @@ kotlinOptions {
 }
 ```
 
-BE ADVISED!!!
-Kycaid SDK uses Google Play Services so it won't work on devices without them. Also to be able to properly test it on the emulator you should use an emulator with up-to-date Google Services(use proper emulator image with Google Services and Play Store installed). We recommend to use at least Pixel 3 for this purposes.
 ## Usage
 
 ### Setup SDK
-
-First of all, you should add ```KycaidActivity``` to app's Manifest.xml  file.
-Place the following under application tag of your Manifest.xml:
-```xml
- <activity android:name="com.kycaid.sdk.ui.KycaidActivity"
-        android:windowSoftInputMode="adjustResize"/>
-```
-
-You can can initialize Kycaid SDK flow via ```KycaidConfiguration``` class. It has inner ```Builder``` class for additional configuration of appearance of the SDK. ```Builder``` constructor has three arguments: ```apiToken```, ```formId``` and ```customHost``` - first two could be obtained from your dashboard, the third one is used to configure custom host for the api, pass ```null``` if you don't use self hosted api.
+You can can initialize Kycaid SDK flow via `KycaidConfiguration` class. It has inner `Builder` class for additional configuration of the SDK. `Builder` constructor has two required arguments: `apiToken` and `formId`, which could be obtained from your dashboard.
 ```kotlin
-val builder = KycaidConfiguration.Builder(/*API Token*/, /*Form Id*/, /*custom host*/).build()
+val config = KycaidConfiguration.Builder(/*API Token*/, /*Form Id*/).build()
 ```
 
 ### Run verification flow
 
-Once you created ```Builder``` object via ```build``` method you can start verification flow using ```startActivityForResult``` method and pass your ```Activity``` of ```Fragment``` class as parameter.
+Once you created ```KycaidConfiguration``` object via ```build``` method you need to create `KycaidIntent` object. It takes `KycaidConfiguration` as an argument.
 ```kotlin
-builder.startActivityForResult(<Activity or Fragment instance>)
+val intent = KycaidIntent(config)
+```
+Then you can start verification flow using ```startActivityForResult``` method and pass your ```Activity``` of ```Fragment``` class as parameter.
+```kotlin
+intent.startActivityForResult(<Activity or Fragment instance>)
 ```
 Or use Activity Result Api as following:
 ```kotlin
 // Declare result launcher as Activity or Fragment class level property
-private val kycaidSdkLauncher = registerForActivityResult(KycaidConfiguration.CreateVerification()) { kycaidResult ->
-    // Handle result(see below)
+private val kycaidSdkLauncher = registerForActivityResult(KycaidIntent.CreateVerification()) { kycaidResult ->
+    // Handle result (see below)
 }
 
 // Launch sdk
-kycaidSdkLauncher.launch(/*KycaidConfiguration instance*/)
+kycaidSdkLauncher.launch(/*KycaidIntent instance*/)
 ```
 
 ### Handle verification result
@@ -94,7 +90,7 @@ To handle result from SDK you should override ```onActivityResult``` method in y
 ```kotlin
 override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
     super.onActivityResult(requestCode, resultCode, data)
-    KycaidConfiguration.onActivityResult(requestCode, resultCode, data) { result ->
+    KycaidIntent.onActivityResult(requestCode, resultCode, data) { result ->
         when(result) {
             is KycaidResult.Success -> // obtain verification id and applicant id
             is KycaidResult.Failure -> // handle error
@@ -108,7 +104,7 @@ override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) 
 
 First of all you should declare ```ActivityResultLauncher``` at top level of your Activity/Fragment like so:
 ```kotlin
-private val kycaidSdkLauncher = registerForActivityResult(KycaidConfiguration.CreateVerification()) { result ->
+private val kycaidSdkLauncher = registerForActivityResult(KycaidIntent.CreateVerification()) { result ->
     when (result) {
         is KycaidResult.Success -> // obtain verification id and applicant id
         is KycaidResult.Failure -> // handle error
@@ -117,7 +113,7 @@ private val kycaidSdkLauncher = registerForActivityResult(KycaidConfiguration.Cr
 }
 ```
 
-The result of SDK flow is presented via ```KycaidResult``` sealed class. ```KycaidResult.Success``` contains verification id and applicant id in case of successful result, ```KycaidResult.Failure``` contains an error code and optional message explaining the reason error happened.
+The result of SDK flow is represented by ```KycaidResult``` sealed class. ```KycaidResult.Success``` contains verification id and applicant id in case of successful result, ```KycaidResult.Failure``` contains an error code and optional message explaining the reason error happened.
 There are several error codes that you can check for and handle correspondingly:
 ```kotlin
 const val KYCAID_ERROR_FORM_ID_MISSING = 10
@@ -145,34 +141,57 @@ You can find explanation of every error in API documentation here: https://docs.
 
 ### Additional configuration
 
-You can apply additional configurations to SDK via ```Builder``` class. For example, you can pass an existing applicant id to create verification for existing applicant.
+You can apply additional configurations to SDK via ```KycaidConfiguration.Builder``` class. For example, you can pass an existing applicant id to create verification for existing applicant.
 ```kotlin
-val builder = KycaidIntent.Builder(/*API Token*/, /*Form Id*/)
+val config = KycaidConfiguration.Builder(/*API Token*/, /*Form Id*/)
     .applicantId(/*Applicant Id*/)
     .build()
+val intent = KycaidIntent(config)
+kycaidSdkLauncher.launch(intent)
 ```
 You can specify a huge amount of color configurations for UI elements of SDK, there are some of them:
+
 ```kotlin
-builder
+config
     .backgroundColor(Color.GRAY)
     .colorPrimary(Color.YELLOW)
     .textColorPrimary(Color.BLUE)
     .textColorSecondary(Color.CYAN)
     // etc
 ```
+You can specify the default language in which the form will be launched.
+```kotlin
+config
+    .language(/*KycaidConfiguration.Language*/)
+```
 
 ## Localization
 
 * English
-* Ukrainian
-* Russian
+* Azeybarjan
+* Brunei
+* German
+* Spanish
+* Spanish (Mexico)
+* French
+* French (Canada)
+* Hindi
+* Croatian
+* Hebrew
+* Yiddish
 * Kazakh
-
-## TODO
-
-* Add example project
-* Color configuration tutorial
-* Jetpack Compose support
+* Dutch
+* Polish
+* Portuguese
+* Portuguese (Brazil)
+* Romanian
+* Russian
+* Serbian
+* Tajik
+* Turkish
+* Ukrainian
+* Uzbek
+* Chinese
 
 ## Links
 
