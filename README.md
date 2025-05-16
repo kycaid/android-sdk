@@ -1,6 +1,6 @@
 # Official KYCAID Android SDK
 
-![GitHub Logo](/art/logo_new_entry.png)
+![GitHub Logo](/images/logo_new_entry.png)
 
 ## Contents
 
@@ -10,8 +10,10 @@
     - [Run verification flow](#run-verification-flow)
     - [Handle verification Result](#handle-verification-result)
     - [Additional configuration](#additional-configuration)
+* [UI customization](#ui-customization)
+* [Screenshots](#screenshots)
 * [Localization](#localization)
-* [Links](#links)
+* [Useful links](#links)
 
 ## Requirements
 
@@ -141,7 +143,7 @@ You can find explanation of every error in API documentation here: https://docs.
 
 ### Additional configuration
 
-You can apply additional configurations to SDK via ```KycaidConfiguration.Builder``` class. For example, you can pass an existing applicant id to create verification for existing applicant.
+You can apply additional configurations to the SDK via ```KycaidConfiguration.Builder``` class. For example, you can pass an existing applicant id to create verification for existing applicant.
 ```kotlin
 val config = KycaidConfiguration.Builder(/*API Token*/, /*Form Id*/)
     .applicantId(/*Applicant Id*/)
@@ -149,7 +151,13 @@ val config = KycaidConfiguration.Builder(/*API Token*/, /*Form Id*/)
 val intent = KycaidIntent(config)
 kycaidSdkLauncher.launch(intent)
 ```
-You can specify a huge amount of color configurations for UI elements of SDK, there are some of them:
+It's also possible to specify `externalApplicantId` to bind it to the applicant created in the KYCAID system, and `environment` to determine which API will be used, `stg-api` or `api`, that is staging or production environment (`KycaidEnvironment.PRODUCTION` by default).
+```kotlin
+config
+    .externalApplicantId(/*External Applicant Id*/)
+    .environment(/*KycaidEnvironment*/)
+```
+You can specify a huge amount of color configurations for UI elements of the SDK. See [UI customization](#ui-customization) to get more details about `ColorConfiguration`. Here are some of the colors:
 
 ```kotlin
 config
@@ -159,13 +167,84 @@ config
     .textColorSecondary(Color.CYAN)
     // etc
 ```
-You can specify the default language in which the form will be launched.
+
+You can specify the default language in which the form will be run by default.
 ```kotlin
 config
     .language(/*KycaidConfiguration.Language*/)
 ```
 
+## UI customization
+
+KYCAID SDK supports basic UI customization. 
+To change UI element colors you can use `KycaidConfiguration.Builder` methods. Here are all the colors you can change:
+```kotlin
+data class ColorConfiguration(
+    @ColorInt val backgroundColor: Int? = null,
+    @ColorInt val colorPrimary: Int? = null,
+    @ColorInt val colorSecondary: Int? = null,
+    @ColorInt val colorOnSecondary: Int? = null,
+    @ColorInt val textFieldBackgroundColor: Int? = null,
+    @ColorInt val inputBorderColor: Int? = null,
+    @ColorInt val disabledInputBorderColor: Int? = null,
+    @ColorInt val textColorPrimary: Int? = null,
+    @ColorInt val textColorSecondary: Int? = null,
+    @ColorInt val colorSurface: Int? = null,
+    @ColorInt val colorOnSurface: Int? = null,
+    @ColorInt val cardBackgroundColor: Int? = null,
+    @ColorInt val buttonTextColor: Int? = null,
+    @ColorInt val outlinedButtonBorderColor: Int? = null,
+    @ColorInt val outlinedButtonTextColor: Int? = null,
+    @ColorInt val textHintColor: Int? = null,
+    @ColorInt val buttonRippleColor: Int? = null,
+    @ColorInt val toolbarColor: Int? = null,
+    @ColorInt val toolbarTextColor: Int? = null,
+    @ColorInt val navigationBarColor: Int? = null,
+    @ColorInt val pendingColor: Int? = null,
+    @ColorInt val successColor: Int? = null,
+    @ColorInt val errorColor: Int? = null,
+    val appearanceLightStatusBars: Boolean = true,
+    val appearanceLightNavigationBars: Boolean = false,
+)
+```
+Note that each property has its default value, so you can change only those you need.
+
+**Example**
+<p float="center">
+    <img src="/images/colors_1.PNG" width="240">
+    <img src="/images/colors_2.PNG" width="240">
+</p>
+<p float="center">
+    <img src="/images/colors_3.PNG" width="240">
+    <img src="/images/colors_4.PNG" width="240">
+</p>
+
+## Screenshots
+
+<p float="center">
+  <img src="/images/screenshots/1.PNG" width="240" />
+  <img src="/images/screenshots/2.PNG" width="240" /> 
+  <img src="/images/screenshots/3.PNG" width="240" />
+</p>
+<p float="center">
+  <img src="/images/screenshots/4.PNG" width="240" />
+  <img src="/images/screenshots/5.PNG" width="240" /> 
+  <img src="/images/screenshots/6.PNG" width="240" />
+</p>
+<p float="center">
+  <img src="/images/screenshots/7.PNG" width="240" />
+  <img src="/images/screenshots/8.PNG" width="240" /> 
+  <img src="/images/screenshots/9.PNG" width="240" />
+</p>
+<p float="center">
+  <img src="/images/screenshots/10.PNG" width="240" />
+  <img src="/images/screenshots/11.PNG" width="240" /> 
+  <img src="/images/screenshots/12.PNG" width="240" />
+</p>
+
 ## Localization
+
+KYCAID SDK supports following languages:
 
 * English
 * Azeybarjan
@@ -192,6 +271,15 @@ config
 * Ukrainian
 * Uzbek
 * Chinese
+* Indonesian
+* Georgian
+* Malay
+* Thai
+* Vietnamese
+* Finnish
+* Japanese
+* Korean
+* Norwegian
 
 ## Links
 
