@@ -1,6 +1,6 @@
 # Official KYCAID Android SDK
 
-![GitHub Logo](/images/logo_new_entry.png)
+![GitHub Logo](/images/logo.png)
 
 ## Contents
 
