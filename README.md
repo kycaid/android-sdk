@@ -1,6 +1,6 @@
 # Official KYCAID Android SDK
 
-![GitHub Logo](/images/logo_new_entry.png)
+![GitHub Logo](/images/logo.png)
 
 ## Contents
 
@@ -58,9 +58,19 @@ kotlinOptions {
 ## Usage
 
 ### Setup SDK
-You can can initialize Kycaid SDK flow via `KycaidConfiguration` class. It has inner `Builder` class for additional configuration of the SDK. `Builder` constructor has two required arguments: `apiToken` and `formId`, which could be obtained from your dashboard.
+
+#### By API Token and Form ID:
+You can initialize Kycaid SDK with `KycaidConfiguration` class. It has inner `Builder` class for additional configuration of the SDK. `Builder` constructor has two required arguments: `apiToken` and `formId`, which can be obtained from your dashboard.
 ```kotlin
-val config = KycaidConfiguration.Builder(/*API Token*/, /*Form Id*/).build()
+val config = KycaidConfiguration.Builder(apiToken = /*API Token*/, formId = /*Form Id*/).build()
+```
+
+#### By Form Token:
+Or if you don't want to hold `apiToken` and `formId` in your app, then you can build `KycaidConfiguration` with `formToken` only that you have to first generate yourself (see this endpoint https://docs.kycaid.com/api/forms/form-get-url). And make sure that you pass applicant ID to the builder when `formToken` is generated with applicant binding (you passed `applicantId` to the `form-get-url` request body).
+```kotlin
+val config = KycaidConfiguration.Builder(formToken = /*Form Token*/)
+    .applicantId(/*Applicant ID*/)
+    .build()
 ```
 
 ### Run verification flow
@@ -125,18 +135,24 @@ const val KYCAID_ERROR_FAILED_TO_CREATE_VERIFICATION = 13
 const val KYCAID_ERROR_UNAUTHORIZED = 14
 const val KYCAID_ERROR_INACTIVE_ACCOUNT = 15
 const val KYCAID_ERROR_INSUFFICIENT_FUNDS = 16
-const val KYCAID_ERROR_NOT_FOUND = 17
-const val KYCAID_ERROR_REQUEST_TIMEOUT = 18
-const val KYCAID_ERROR_DUPLICATE_DATA = 19
-const val KYCAID_ERROR_FLOW = 20
-const val KYCAID_ERROR_EDIT_DENIED = 21
-const val KYCAID_ERROR_DELETE_DENIED = 22
-const val KYCAID_ERROR_VALIDATION = 23
-const val KYCAID_ERROR_APPLICANT_EXISTS = 24
-const val KYCAID_ERROR_VERIFICATION_EXISTS = 25
-const val KYCAID_ERROR_INSUFFICIENT_DATA = 26
-const val KYCAID_ERROR_LIMIT_EXCEEDED = 27
-const val KYCAID_ERROR_INTERNAL_SERVER = 28
+const val KYCAID_ERROR_FORBIDDEN_DUPLICATES_RETRIES = 17
+const val KYCAID_ERROR_FORBIDDEN_AGE_RESTRICTED_RETRIES = 18
+const val KYCAID_ERROR_FORBIDDEN_COUNTRY_RESTRICTED_RETRIES = 19
+const val KYCAID_ERROR_FORBIDDEN_COMPROMISED_PERSON_RETRIES = 20
+const val KYCAID_ERROR_FORBIDDEN_FAKE_DOCUMENT_RETRIES = 21
+const val KYCAID_ERROR_NOT_FOUND = 22
+const val KYCAID_ERROR_REQUEST_TIMEOUT = 23
+const val KYCAID_ERROR_DUPLICATE_DATA = 24
+const val KYCAID_ERROR_FLOW = 25
+const val KYCAID_ERROR_EDIT_DENIED = 26
+const val KYCAID_ERROR_DELETE_DENIED = 27
+const val KYCAID_ERROR_VALIDATION = 28
+const val KYCAID_ERROR_APPLICANT_EXISTS = 29
+const val KYCAID_ERROR_VERIFICATION_EXISTS = 30
+const val KYCAID_ERROR_INSUFFICIENT_DATA = 31
+const val KYCAID_ERROR_LIMIT_EXCEEDED = 32
+const val KYCAID_ERROR_INTERNAL_SERVER = 33
+const val KYCAID_ERROR_NETWORK_ERROR = 34
 ```
 
 You can find explanation of every error in API documentation here: https://docs.kycaid.com/#errors
@@ -222,24 +238,23 @@ Note that each property has its default value, so you can change only those you 
 ## Screenshots
 
 <p float="center">
-  <img src="/images/screenshots/1.PNG" width="240" />
-  <img src="/images/screenshots/2.PNG" width="240" /> 
-  <img src="/images/screenshots/3.PNG" width="240" />
+  <img src="/images/screenshots/1.jpg" width="240" />
+  <img src="/images/screenshots/2.jpg" width="240" /> 
+  <img src="/images/screenshots/3.jpg" width="240" />
 </p>
 <p float="center">
-  <img src="/images/screenshots/4.PNG" width="240" />
-  <img src="/images/screenshots/5.PNG" width="240" /> 
-  <img src="/images/screenshots/6.PNG" width="240" />
+  <img src="/images/screenshots/4.jpg" width="240" />
+  <img src="/images/screenshots/5.jpg" width="240" /> 
+  <img src="/images/screenshots/6.jpg" width="240" />
 </p>
 <p float="center">
-  <img src="/images/screenshots/7.PNG" width="240" />
-  <img src="/images/screenshots/8.PNG" width="240" /> 
-  <img src="/images/screenshots/9.PNG" width="240" />
+  <img src="/images/screenshots/7.jpg" width="240" />
+  <img src="/images/screenshots/8.jpg" width="240" /> 
+  <img src="/images/screenshots/9.jpg" width="240" />
 </p>
 <p float="center">
-  <img src="/images/screenshots/10.PNG" width="240" />
-  <img src="/images/screenshots/11.PNG" width="240" /> 
-  <img src="/images/screenshots/12.PNG" width="240" />
+  <img src="/images/screenshots/10.jpg" width="240" />
+  <img src="/images/screenshots/11.jpg" width="240" /> 
 </p>
 
 ## Localization
