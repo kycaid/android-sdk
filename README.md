@@ -173,67 +173,313 @@ config
     .externalApplicantId(/*External Applicant Id*/)
     .environment(/*KycaidEnvironment*/)
 ```
-You can specify a huge amount of color configurations for UI elements of the SDK. See [UI customization](#ui-customization) to get more details about `ColorConfiguration`. Here are some of the colors:
-
-```kotlin
-config
-    .backgroundColor(Color.GRAY)
-    .colorPrimary(Color.YELLOW)
-    .textColorPrimary(Color.BLUE)
-    .textColorSecondary(Color.CYAN)
-    // etc
-```
-
 You can specify the default language in which the form will be run by default.
 ```kotlin
 config
-    .language(/*KycaidConfiguration.Language*/)
+    .language(/*KycaidLanguage*/)
 ```
 
 ## UI customization
 
-KYCAID SDK supports basic UI customization. 
-To change UI element colors you can use `KycaidConfiguration.Builder` methods. Here are all the colors you can change:
+KYCAID SDK supports basic UI customization. You can specify a huge amount of colors for UI elements of the SDK. All you need is build `KycaidTheme` with help of `KycaidTheme.Builder` like this:
+
 ```kotlin
-data class ColorConfiguration(
-    @ColorInt val backgroundColor: Int? = null,
-    @ColorInt val colorPrimary: Int? = null,
-    @ColorInt val colorSecondary: Int? = null,
-    @ColorInt val colorOnSecondary: Int? = null,
-    @ColorInt val textFieldBackgroundColor: Int? = null,
-    @ColorInt val inputBorderColor: Int? = null,
-    @ColorInt val disabledInputBorderColor: Int? = null,
-    @ColorInt val textColorPrimary: Int? = null,
-    @ColorInt val textColorSecondary: Int? = null,
-    @ColorInt val colorSurface: Int? = null,
-    @ColorInt val colorOnSurface: Int? = null,
-    @ColorInt val cardBackgroundColor: Int? = null,
-    @ColorInt val buttonTextColor: Int? = null,
-    @ColorInt val outlinedButtonBorderColor: Int? = null,
-    @ColorInt val outlinedButtonTextColor: Int? = null,
-    @ColorInt val textHintColor: Int? = null,
-    @ColorInt val buttonRippleColor: Int? = null,
-    @ColorInt val toolbarColor: Int? = null,
-    @ColorInt val toolbarTextColor: Int? = null,
-    @ColorInt val navigationBarColor: Int? = null,
-    @ColorInt val pendingColor: Int? = null,
-    @ColorInt val successColor: Int? = null,
-    @ColorInt val errorColor: Int? = null,
-    val appearanceLightStatusBars: Boolean = true,
-    val appearanceLightNavigationBars: Boolean = false,
+val theme = KycaidTheme.Builder()
+    .colorScheme(
+        KycaidTheme.ColorScheme(
+            backgroundColor = Color.GRAY,
+            primaryColor = Color.YELLOW,
+            textPrimaryColor = Color.BLUE,
+            textSecondaryColor = Color.CYAN
+        )
+    )
+    .build()
+val config = KycaidConfiguration.Builder(/*API Token*/, /*Form Id*/)
+    .theme(theme)
+    .build()
+```
+Here are all the colors you can change:
+```kotlin
+/**
+ * Defines the main color palette for the SDK.
+ *
+ * These colors represent the core theme roles (backgrounds, accent colors, surfaces, text colors and status colors)
+ * used throughout the user interface.
+ *
+ * Most component-specific color sets (e.g., CardColors, ButtonColors) will use these as their defaults
+ * if not explicitly overridden.
+ *
+ * Unset colors (COLOR_UNSPECIFIED) will be resolved to their defaults internally.
+ */
+@Serializable
+data class ColorScheme(
+    /** The main background color used for screens. */
+    @ColorInt val backgroundColor: Int = COLOR_UNSPECIFIED,
+
+    /**
+     * The primary brand color used for major UI elements and key actions such as:
+     * - action buttons (e.g., “Continue”, “Submit”)
+     * - active elements (e.g., selected and focused elements, checked radio buttons and check boxes)
+     * - progress indicators
+     * - hyperlinks (unless overridden by hyperlinkColor)
+     */
+    @ColorInt val primaryColor: Int = COLOR_UNSPECIFIED,
+
+    /** The color used for text and icons displayed on top of primaryColor backgrounds. */
+    @ColorInt val onPrimaryColor: Int = COLOR_UNSPECIFIED,
+
+    /**
+     * The secondary accent color, used to highlight secondary actions or elements,
+     * such as selection indication in dropdown lists.
+     */
+    @ColorInt val secondaryColor: Int = COLOR_UNSPECIFIED,
+
+    /** The color used for text and icons displayed on top of secondaryColor backgrounds. */
+    @ColorInt val onSecondaryColor: Int = COLOR_UNSPECIFIED,
+
+    /** The tertiary accent color, intended for decorative elements such as the stars in the instructions. */
+    @ColorInt val tertiaryColor: Int = COLOR_UNSPECIFIED,
+
+    /** Background color for surfaces, containers and elevated elements. Usually used for dropdown lists. */
+    @ColorInt val surfaceColor: Int = COLOR_UNSPECIFIED,
+
+    /** The color used for text and icons displayed on top of surfaceColor backgrounds. */
+    @ColorInt val onSurfaceColor: Int = COLOR_UNSPECIFIED,
+
+    /**
+     * The color used for strokes around primary elements such as:
+     * - cards
+     * - text inputs
+     * - radio buttons
+     * - check boxes
+     * - other elements that have stroke
+     *
+     * unless it's not overridden by component-specific colors.
+     */
+    @ColorInt val primaryStrokeColor: Int = COLOR_UNSPECIFIED,
+
+    /** The primary text color used for most text in the SDK. */
+    @ColorInt val textPrimaryColor: Int = COLOR_UNSPECIFIED,
+
+    /**
+     * The secondary text color used for supporting or less prominent text,
+     * such as instructions, subtitles.
+     */
+    @ColorInt val textSecondaryColor: Int = COLOR_UNSPECIFIED,
+
+    /** The color used for hyperlink text and interactive links. */
+    @ColorInt val hyperlinkColor: Int = COLOR_UNSPECIFIED,
+
+    /** The color used to indicate pending statuses. */
+    @ColorInt val pendingColor: Int = COLOR_UNSPECIFIED,
+
+    /** The color used to indicate successful statuses. */
+    @ColorInt val successColor: Int = COLOR_UNSPECIFIED,
+
+    /** The color used to indicate errors, failures, or negative statuses. */
+    @ColorInt val errorColor: Int = COLOR_UNSPECIFIED,
+
+    /**
+     * "The color used for divider lines between content and control elements,
+     * such as the divider between the document type selector and the "Continue" button."
+     */
+    @ColorInt val dividerColor: Int = COLOR_UNSPECIFIED,
+
+    /** The color used for the status bar background. */
+    @ColorInt val statusBarColor: Int = COLOR_UNSPECIFIED,
+
+    /**
+     * Determines whether the status bar content (icons and text) should be light or dark.
+     * If you use a light color for the status bar background,
+     * `appearanceLightStatusBars` should be set to `true` in order to
+     * indicate the system that the status bar content should be dark.
+     */
+    val appearanceLightStatusBars: Boolean = false,
+
+    /** The color used for the navigation bar background. */
+    @ColorInt val navigationBarColor: Int = COLOR_UNSPECIFIED,
+
+    /**
+     * Determines whether the navigation buttons should be light or dark.
+     * If you use a light color for the navigation bar background,
+     * `appearanceLightNavigationBars` should be set to `true` in order to
+     * indicate the system that the navigation buttons should be dark.
+     */
+    val appearanceLightNavigationBars: Boolean = true,
+)
+
+@Serializable
+data class CardColors(
+    /** The background color of cards and card-like surfaces. */
+    @ColorInt val backgroundColor: Int = COLOR_UNSPECIFIED,
+
+    /** The stroke color of cards. */
+    @ColorInt val strokeColor: Int = COLOR_UNSPECIFIED,
+
+    /** The color used for text and icons displayed on cards. */
+    @ColorInt val onCardColor: Int = COLOR_UNSPECIFIED,
+)
+
+@Serializable
+data class TextInputColors(
+    /** The background color of text input fields. */
+    @ColorInt val backgroundColor: Int = COLOR_UNSPECIFIED,
+
+    /** The stroke color of text input fields. */
+    @ColorInt val strokeColor: Int = COLOR_UNSPECIFIED,
+
+    /** The color of entered text in text input fields. */
+    @ColorInt val textColor: Int = COLOR_UNSPECIFIED,
+
+    /** The color of hint text (or placeholder) in text input fields. */
+    @ColorInt val hintTextColor: Int = COLOR_UNSPECIFIED,
+
+    /** The color of the text cursor in text input fields. */
+    @ColorInt val cursorColor: Int = COLOR_UNSPECIFIED,
+
+    /** The background color of disabled text input fields. */
+    @ColorInt val disabledBackgroundColor: Int = COLOR_UNSPECIFIED,
+
+    /** The stroke color of disabled text input fields. */
+    @ColorInt val disabledStrokeColor: Int = COLOR_UNSPECIFIED,
+
+    /** The color of entered text in disabled text input fields. */
+    @ColorInt val disabledTextColor: Int = COLOR_UNSPECIFIED,
+
+    /** The color of hint text (or placeholder) in disabled text input fields. */
+    @ColorInt val disabledHintTextColor: Int = COLOR_UNSPECIFIED,
+
+    /** The stroke color of focused text input fields. */
+    @ColorInt val focusedStrokeColor: Int = COLOR_UNSPECIFIED,
+)
+
+@Serializable
+data class DropdownColors(
+    /** The background color of the dropdown button (the view that triggers the list showing). */
+    @ColorInt val backgroundColor: Int = COLOR_UNSPECIFIED,
+
+    /** The stroke color of the dropdown button. */
+    @ColorInt val strokeColor: Int = COLOR_UNSPECIFIED,
+
+    /** The color of text in the dropdown button. */
+    @ColorInt val textColor: Int = COLOR_UNSPECIFIED,
+
+    /** The color of hint text (or placeholder) in the dropdown button. */
+    @ColorInt val hintTextColor: Int = COLOR_UNSPECIFIED,
+
+    /** The tint color for the dropdown arrow icon. */
+    @ColorInt val arrowTintColor: Int = COLOR_UNSPECIFIED,
+
+    /** The stroke color of the focused dropdown button. */
+    @ColorInt val focusedStrokeColor: Int = COLOR_UNSPECIFIED,
+)
+
+@Serializable
+data class RadioButtonColors(
+    /** The background color of radio buttons. */
+    @ColorInt val backgroundColor: Int = COLOR_UNSPECIFIED,
+
+    /** The stroke color of radio buttons. */
+    @ColorInt val strokeColor: Int = COLOR_UNSPECIFIED,
+
+    /** The color of text labels associated with radio buttons. */
+    @ColorInt val textColor: Int = COLOR_UNSPECIFIED,
+
+    /** The tint color applied to the radio button indicator. */
+    @ColorInt val buttonTintColor: Int = COLOR_UNSPECIFIED,
+)
+
+@Serializable
+data class CheckBoxColors(
+    /** The background color of checkboxes. */
+    @ColorInt val backgroundColor: Int = COLOR_UNSPECIFIED,
+
+    /** The stroke color of checkboxes. */
+    @ColorInt val strokeColor: Int = COLOR_UNSPECIFIED,
+
+    /** The color of text labels associated with checkboxes. */
+    @ColorInt val textColor: Int = COLOR_UNSPECIFIED,
+
+    /** The tint color applied to the checkbox checkmark (when it's checked). */
+    @ColorInt val buttonTintColor: Int = COLOR_UNSPECIFIED,
+)
+
+@Serializable
+data class ToolbarColors(
+    /** The background color of the toolbar (or top bar). */
+    @ColorInt val backgroundColor: Int = COLOR_UNSPECIFIED,
+
+    /** The stroke color of the toolbar. */
+    @ColorInt val strokeColor: Int = COLOR_UNSPECIFIED,
+
+    /** The color of the toolbar's title text. */
+    @ColorInt val textColor: Int = COLOR_UNSPECIFIED,
+
+    /** The tint color for the back button icon in the toolbar. */
+    @ColorInt val backButtonTintColor: Int = COLOR_UNSPECIFIED,
+
+    /** The tint color for the language icon in the toolbar. */
+    @ColorInt val languageIconTintColor: Int = COLOR_UNSPECIFIED,
+)
+
+@Serializable
+data class ButtonColors(
+    /** The background color of normal buttons. */
+    @ColorInt val backgroundColor: Int = COLOR_UNSPECIFIED,
+
+    /** The color of text and icons in normal buttons. */
+    @ColorInt val textColor: Int = COLOR_UNSPECIFIED,
+
+    /** The ripple (touch feedback) color for normal buttons. */
+    @ColorInt val rippleColor: Int = COLOR_UNSPECIFIED,
+
+    /** The background color of disabled buttons. */
+    @ColorInt val disabledBackgroundColor: Int = COLOR_UNSPECIFIED,
+
+    /** The color of text and icons in disabled buttons. */
+    @ColorInt val disabledTextColor: Int = COLOR_UNSPECIFIED,
+)
+
+@Serializable
+data class OutlinedButtonColors(
+    /** The background color of outlined buttons (usually transparent). */
+    @ColorInt val backgroundColor: Int = COLOR_UNSPECIFIED,
+
+    /** The stroke color of outlined buttons. */
+    @ColorInt val strokeColor: Int = COLOR_UNSPECIFIED,
+
+    /** The color of text and icons in outlined buttons. */
+    @ColorInt val textColor: Int = COLOR_UNSPECIFIED,
+)
+
+@Serializable
+data class DocumentTypeButtonColors(
+    /** The background color of document type selection buttons. */
+    @ColorInt val backgroundColor: Int = COLOR_UNSPECIFIED,
+
+    /** The stroke color of document type selection buttons. */
+    @ColorInt val strokeColor: Int = COLOR_UNSPECIFIED,
+
+    /** The color of text in document type selection buttons. */
+    @ColorInt val textColor: Int = COLOR_UNSPECIFIED,
+
+    /** The background color of the document icon in selection buttons. */
+    @ColorInt val iconBackgroundColor: Int = COLOR_UNSPECIFIED,
+
+    /** The tint color applied to the document icon in selection buttons. */
+    @ColorInt val iconTintColor: Int = COLOR_UNSPECIFIED,
+
+    /** The background color when a document type button is selected. */
+    @ColorInt val selectedBackgroundColor: Int = COLOR_UNSPECIFIED,
+
+    /** The stroke color when a document type button is selected. */
+    @ColorInt val selectedStrokeColor: Int = COLOR_UNSPECIFIED,
+
+    /** The text color when a document type button is selected. */
+    @ColorInt val selectedTextColor: Int = COLOR_UNSPECIFIED,
 )
 ```
 Note that each property has its default value, so you can change only those you need.
-
-**Example**
-<p float="center">
-    <img src="/images/colors_1.PNG" width="240">
-    <img src="/images/colors_2.PNG" width="240">
-</p>
-<p float="center">
-    <img src="/images/colors_3.PNG" width="240">
-    <img src="/images/colors_4.PNG" width="240">
-</p>
 
 ## Screenshots
 
