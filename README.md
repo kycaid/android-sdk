@@ -9,6 +9,7 @@
     - [Setup SDK](#setup-sdk)
     - [Run verification flow](#run-verification-flow)
     - [Handle verification Result](#handle-verification-result)
+    - [Get verification status](#get-verification-status)
     - [Additional configuration](#additional-configuration)
 * [UI customization](#ui-customization)
 * [Screenshots](#screenshots)
@@ -125,7 +126,7 @@ private val kycaidSdkLauncher = registerForActivityResult(KycaidIntent.CreateVer
 }
 ```
 
-The result of SDK flow is represented by ```KycaidResult``` sealed class. ```KycaidResult.Success``` contains verification id and applicant id in case of successful result, ```KycaidResult.Failure``` contains an error code and optional message explaining the reason error happened.
+The result of SDK flow is represented by ```KycaidResult``` sealed class. ```KycaidResult.Success``` contains verification id, applicant id and the current verification status in case of successful result, ```KycaidResult.Failure``` contains an error code and optional message explaining the reason error happened.
 There are several error codes that you can check for and handle correspondingly:
 ```kotlin
 const val KYCAID_ERROR_FORM_ID_MISSING = 10
@@ -155,7 +156,77 @@ const val KYCAID_ERROR_INTERNAL_SERVER = 33
 const val KYCAID_ERROR_NETWORK_ERROR = 34
 ```
 
-You can find explanation of every error in API documentation here: https://docs.kycaid.com/#errors
+You can find an explanation for every error in the API documentation here: https://docs-v1.kycaid.com/#errors
+
+### Get verification status
+
+Once you have `verificationId` it's possible to check the verification status using `KycaidApi` class. You just need to initialise it with the same `KycaidConfiguration` you used during the verification flow and then call following method:
+```kotlin
+val kycaidApi = KycaidApi(config)
+kycaidApi.getVerificationState(/*Verification Id*/)
+```
+Note that `getVerificationState` is a suspend function that returns `Result<VerificationState>`.
+`VerificationState` contains the verification status and the verification steps with their particular statuses and decline reasons.
+```kotlin
+data class VerificationState(
+    val verificationId: String,
+    val applicantId: String,
+    val verifications: List<Verification>,
+    val status: VerificationStatus,
+)
+
+enum class VerificationStatus {
+    PENDING, APPROVED, DECLINED
+}
+
+data class Verification(
+    val type: Type,
+    val status: VerificationStatus,
+    val comment: String?,
+    val declineReasons: List<DeclineReason>
+) {
+    enum class Type {
+        PROFILE,
+        DOCUMENT,
+        FACIAL,
+        ADDRESS,
+        DATABASE_SCREENING,
+        QUESTIONNAIRE,
+        UNDEFINED,
+    }
+
+    enum class DeclineReason {
+        OTHER,
+        WRONG_NAME,
+        WRONG_DOB,
+        AGE_RESTRICTION,
+        EXPIRED_DOCUMENT,
+        BAD_QUALITY,
+        FAKE_DOCUMENT,
+        WRONG_INFO,
+        PROHIBITED_JURISDICTION,
+        NO_SELFIE,
+        DIFFERENT_FACES,
+        WRONG_DOCUMENT,
+        DUPLICATE,
+        DOCUMENT_DAMAGED,
+        DOCUMENT_INCOMPLETE,
+        FRAUDULENT,
+        TAX_ID_REQUIRED,
+        COMPROMISED_PERSON,
+        EDITED_DOCUMENT,
+        MULTIPLE_PERSON,
+        COMPULSION,
+        LIMIT_REACHED_OTP,
+        IP_MISMATCH,
+        ANONYMIZING_NETWORK,
+        DEBTOR,
+        QES_MISMATCH,
+        UNDEFINED,
+    }
+}
+```
+You can find a description for every decline reason in the API documentation: https://docs.kycaid.com/decline-reasons
 
 ### Additional configuration
 
