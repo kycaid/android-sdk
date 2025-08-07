@@ -549,6 +549,54 @@ data class DocumentTypeButtonColors(
     /** The text color when a document type button is selected. */
     @ColorInt val selectedTextColor: Int = COLOR_UNSPECIFIED,
 )
+
+@Serializable
+data class AlertDialogColors(
+    /** The background color of the alert dialog.
+     * Defaults to `ColorScheme.surfaceColor` unless explicitly specified. */
+    @ColorInt val backgroundColor: Int = COLOR_UNSPECIFIED,
+
+    /** The color of the title in the alert dialog.
+     * Defaults to `ColorScheme.onSurfaceColor` unless explicitly specified. */
+    @ColorInt val titleColor: Int = COLOR_UNSPECIFIED,
+
+    /** The color of the message in the alert dialog.
+     * Defaults to `ColorScheme.onSurfaceColor` unless explicitly specified. */
+    @ColorInt val messageColor: Int = COLOR_UNSPECIFIED,
+
+    /** Colors for the cancel button in the alert dialog */
+    val cancelButton: CancelButton = CancelButton(),
+
+    /** Colors for the action button in the alert dialog */
+    val actionButton: ActionButton = ActionButton()
+
+) {
+    @Serializable
+    data class CancelButton(
+        /** The background color of the cancel button.
+         * Defaults to `OutlinedButtonColors.backgroundColor` unless explicitly specified. */
+        @ColorInt val backgroundColor: Int = COLOR_UNSPECIFIED,
+
+        /** The stroke color of the cancel button.
+         * Defaults to `OutlinedButtonColors.strokeColor` unless explicitly specified. */
+        @ColorInt val strokeColor: Int = COLOR_UNSPECIFIED,
+
+        /** The text color in the cancel button.
+         * Defaults to `OutlinedButtonColors.textColor` unless explicitly specified. */
+        @ColorInt val textColor: Int = COLOR_UNSPECIFIED,
+    )
+
+    @Serializable
+    data class ActionButton(
+        /** The background color of the action button.
+         * Defaults to `ButtonColors.backgroundColor` unless explicitly specified. */
+        @ColorInt val backgroundColor: Int = COLOR_UNSPECIFIED,
+
+        /** The text color in the action button.
+         * Defaults to `ButtonColors.textColor` unless explicitly specified. */
+        @ColorInt val textColor: Int = COLOR_UNSPECIFIED,
+    )
+}
 ```
 Note that each property has its default value, so you can change only those you need.
 
