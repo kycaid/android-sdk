@@ -22,6 +22,8 @@
 * Java version 11+
 
 ## Integration
+> If you are working with [Flutter](https://docs.flutter.dev/), you can take a look at this [quick guide](https://github.com/kycaid/android-sdk/blob/master/Flutter%20Integration%20Guide.md) to integrating the KYCAID SDK into a Flutter app.
+
 To use Kycaid SDK you should do three simple steps:
 1. Add maven repository to your `allprojects` closure in project's build.gradle file:
 ```gradle
@@ -33,11 +35,10 @@ allprojects {
     }
 }
 ```
-or
+or for Kotlin DSL:
 ```Kotlin
 maven(url = "https://nexus.kycaid.com/repository/android")
 ```
-for Kotlin DSL.
 
 2. Add dependency to module's build.gradle file:
 ```gradle
