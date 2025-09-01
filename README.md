@@ -409,6 +409,9 @@ data class TextInputColors(
     /** The color of the text cursor in text input fields. */
     @ColorInt val cursorColor: Int = COLOR_UNSPECIFIED,
 
+    /** The color of the label above text fields, dropdowns, check boxes, radio buttons and other input fields */
+    @ColorInt val labelColor: Int = COLOR_UNSPECIFIED,
+
     /** The background color of disabled text input fields. */
     @ColorInt val disabledBackgroundColor: Int = COLOR_UNSPECIFIED,
 
@@ -484,14 +487,17 @@ data class ToolbarColors(
     /** The stroke color of the toolbar. */
     @ColorInt val strokeColor: Int = COLOR_UNSPECIFIED,
 
-    /** The color of the toolbar's title text. */
-    @ColorInt val textColor: Int = COLOR_UNSPECIFIED,
+    /** The color of the title (step label) in the toolbar. */
+    @ColorInt val titleColor: Int = COLOR_UNSPECIFIED,
+
+    /** The color of the subtitle (step description) in the toolbar. */
+    @ColorInt val subtitleColor: Int = COLOR_UNSPECIFIED,
 
     /** The tint color for the back button icon in the toolbar. */
     @ColorInt val backButtonTintColor: Int = COLOR_UNSPECIFIED,
 
     /** The tint color for the language icon in the toolbar. */
-    @ColorInt val languageIconTintColor: Int = COLOR_UNSPECIFIED,
+    @ColorInt val languageButtonTintColor: Int = COLOR_UNSPECIFIED,
 )
 
 @Serializable
