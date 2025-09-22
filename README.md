@@ -68,12 +68,11 @@ val config = KycaidConfiguration.Builder(apiToken = /*API Token*/, formId = /*Fo
 ```
 
 #### By Form Token:
-Or if you don't want to hold `apiToken` and `formId` in your app, then you can build `KycaidConfiguration` with `formToken` only that you have to first generate yourself (see this endpoint https://docs.kycaid.com/api/forms/form-get-url). And make sure that you pass applicant ID to the builder when `formToken` is generated with applicant binding (you passed `applicantId` to the `form-get-url` request body).
+If you don't want to hold `apiToken` and `formId` in your app, then you can build `KycaidConfiguration` with `formToken`, which you must obtain yourself using this endpoint: https://docs.kycaid.com/api/forms/form-get-url.
 ```kotlin
-val config = KycaidConfiguration.Builder(formToken = /*Form Token*/)
-    .applicantId(/*Applicant ID*/)
-    .build()
+val config = KycaidConfiguration.Builder(formToken = /*Form Token*/).build()
 ```
+> Note: if you want to run a form for a specific applicant, you should pass `applicant_id` in the `form-get-url` request body so that the applicant is linked to the form. Otherwise new applicant will be created.
 
 ### Run verification flow
 
