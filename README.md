@@ -18,6 +18,7 @@
 
 ## Requirements
 
+* Kotlin 2.1.0+
 * Android API level 23+
 * Java version 11+
 
