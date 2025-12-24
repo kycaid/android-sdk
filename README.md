@@ -11,6 +11,7 @@
     - [Handle verification Result](#handle-verification-result)
     - [Get verification status](#get-verification-status)
     - [Additional configuration](#additional-configuration)
+* [Analytics](#analytics)
 * [UI customization](#ui-customization)
 * [Screenshots](#screenshots)
 * [Localization](#localization)
@@ -249,6 +250,25 @@ You can specify the default language in which the form will be run by default.
 ```kotlin
 config
     .language(/*KycaidLanguage*/)
+```
+
+## Analytics
+
+In case you need to gather analytics about user actions during the verification flow, you can use `KycaidAnalyticsListener` interface to subscribe to analytics events coming from the SDK:
+```kotlin
+class MyAnalyticsListener: KycaidAnalyticsListener {
+
+    override fun onEvent(
+        event: String,
+        params: Map<String, Any>,
+    ) {
+        // Handle those events as you wish, for example, send them to your Firebase Analytics.
+    }
+}
+
+val config = KycaidConfiguration.Builder(/*API Token*/, /*Form Id*/)
+    .analyticsListener(MyAnalyticsListener())
+    .build()
 ```
 
 ## UI customization
@@ -672,6 +692,8 @@ KYCAID SDK supports following languages:
 * Nepali
 * Sinhala
 * Tamil
+* Arabic
+* Kyrgyz
 
 ## Links
 
