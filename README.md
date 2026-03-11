@@ -26,7 +26,7 @@
 ## Integration
 > If you are working with [Flutter](https://docs.flutter.dev/), you can take a look at this [quick guide](https://github.com/kycaid/android-sdk/blob/master/Flutter%20Integration%20Guide.md) to integrating the KYCAID SDK into a Flutter app.
 
-To use Kycaid SDK you should do three simple steps:
+To use Kycaid SDK you should go through these simple steps:
 1. Add maven repository to your `allprojects` closure in project's build.gradle file:
 ```gradle
 allprojects {
@@ -42,13 +42,51 @@ or for Kotlin DSL:
 maven(url = "https://nexus.kycaid.com/repository/android")
 ```
 
-2. Add dependency to module's build.gradle file:
-```gradle
-implementation('com.kycaid:kycaid-sdk:x.y.z')
-```
-where x.y.z - latest version that can be checked in [Releases](https://github.com/kycaid/android-sdk/releases) section of Github.
+2. Add the SDK dependency to your module's `build.gradle` file. The SDK is distributed in two variants to accommodate different deployment environments:
+- **Standard:** Relies on Google Mobile Services. Use this variant if your application is distributed via Google Play or targets devices guaranteed to have Google Play Services installed.
+    ```gradle
+    implementation('com.kycaid:kycaid-sdk:x.y.z')
+    ```
+- **Non-GMS:** A standalone version completely independent of Google infrastructure. Use this variant if you distribute your app directly to customers as an `.apk` or target devices without GMS.
+    ```gradle
+    implementation('com.kycaid:kycaid-sdk-nongms:x.y.z')
+    ```
+*Note: Replace `x.y.z` with the latest version available in the GitHub [Releases](https://github.com/kycaid/android-sdk/releases) section.*
 
-3. Kycaid SDK requires at minimum Java 11+, so you need to add following lines to your module's build.gradle file to `android` closure:
+> **Important Warning for Google Play Distribution:** Do not use the `nongms` variant for apps distributed through the Google Play Store. Because this standalone version is designed to dynamically download executable native libraries (`.so` files) from a remote server at runtime to minimize the initial APK size, it violates Google Play's Device and Network Abuse policy regarding downloading executable code. Publishing an app with this variant to Google Play risks immediate rejection or app suspension.
+
+> **Emulator Compatibility Note:** The `nongms` variant may crash when run on Android emulators. Because this version dynamically loads native `.so` files at runtime, architecture mismatches (e.g., x86/x86_64 vs. ARM) on virtual devices can prevent these libraries from initializing correctly. It is highly recommended to test the non-GMS variant exclusively on physical Android devices.
+
+3. **Size Optimization (Non-GMS only).** Because the `kycaid-sdk-nongms` variant bundles the ML models and native binaries, you must exclude unused assets and `.so` libraries to prevent inflating your final `.apk` size. Add the following configuration to the `android` block in your module's `build.gradle` file to strip out these files and drastically reduce the size impact:
+
+```gradle
+androidResources {
+    // Exclude unused ML assets (Saves ~3 MB)
+    ignoreAssetsPattern = ignoreAssetsPattern + ':!LMprec_600.emd:!contours.tfl:!BCLjoy_200.emd:!BCLlefteyeclosed_200.emd:!BCLrighteyeclosed_200.emd:!fssd_medium_8bit_v5.tflite:!fssd_medium_8bit_gray_v5.tflite'
+}
+
+packagingOptions {
+    // Exclude redundant native face detection libraries
+    // Saves ~8 MB per ABI architecture, reducing total APK size by 30+ MB
+    exclude 'lib/*/libface_detector_v2_jni.so'
+}
+```
+or for Kotlin DSL (build.gradle.kts):
+
+```Kotlin
+androidResources {
+    // Exclude unused ML assets (Saves ~3 MB)
+    ignoreAssetsPattern += ":!LMprec_600.emd:!contours.tfl:!BCLjoy_200.emd:!BCLlefteyeclosed_200.emd:!BCLrighteyeclosed_200.emd:!fssd_medium_8bit_v5.tflite:!fssd_medium_8bit_gray_v5.tflite"
+}
+
+packaging {
+    // Exclude redundant native face detection libraries
+    // Saves ~8 MB per ABI architecture, reducing total APK size by 30+ MB
+    jniLibs.excludes.add("lib/*/libface_detector_v2_jni.so")
+}
+```
+
+4. Kycaid SDK requires at minimum Java 11+, so you need to add following lines to your module's build.gradle file to `android` closure:
 ```gradle
 compileOptions {
     sourceCompatibility JavaVersion.VERSION_11
