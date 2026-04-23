@@ -289,6 +289,11 @@ You can specify the default language in which the form will be run by default.
 config
     .language(/*KycaidLanguage*/)
 ```
+In case you want to delegate closing the verification `Activity` to a customer, even though there's always an option to swipe the verification down, you can enable an explicit complete button shown at the verification status screen (the last one), which immediately closes the verification flow with `ActivityResult` triggering.
+```kotlin
+config
+    .showsCompleteButton(true) // false by default
+```
 
 ## Analytics
 
