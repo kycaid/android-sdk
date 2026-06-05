@@ -33,16 +33,16 @@ allprojects {
     repositories {
         google()
         mavenCentral()
-        maven { url "https://nexus.kycaid.com/repository/android" }
+        maven { url "https://europe-west1-maven.pkg.dev/know-your-client-aid/android" }
     }
 }
 ```
 or for Kotlin DSL:
 ```Kotlin
-maven(url = "https://nexus.kycaid.com/repository/android")
+maven(url = "https://europe-west1-maven.pkg.dev/know-your-client-aid/android")
 ```
 
-2. Add the SDK dependency to your module's `build.gradle` file. The SDK is distributed in two variants to accommodate different deployment environments:
+2. Add the SDK dependency to your module's `build.gradle` file. The SDK is distributed in different variants to accommodate various deployment environments:
 - **Standard:** Relies on Google Mobile Services. Use this variant if your application is distributed via Google Play or targets devices guaranteed to have Google Play Services installed.
     ```gradle
     implementation('com.kycaid:kycaid-sdk:x.y.z')
@@ -51,11 +51,14 @@ maven(url = "https://nexus.kycaid.com/repository/android")
     ```gradle
     implementation('com.kycaid:kycaid-sdk-nongms:x.y.z')
     ```
+- **Ktor2:** A variant of the SDK compatible with Ktor 2. The main SDK artifact utilizes Ktor 3 so that it imposes a constraint on the consumer's environment to use Ktor 3 too. If your project is tightly tied to Ktor 2, you can use these artifacts, but be aware that this branch may not recieve all updates unlike the main branch. However, all crticial fixes and features will be ported here.
+    ```gradle
+    implementation('com.kycaid:kycaid-sdk-ktor2:x.y.z')
+    implementation('com.kycaid:kycaid-sdk-nongms-ktor2:x.y.z')
+    ```
 *Note: Replace `x.y.z` with the latest version available in the GitHub [Releases](https://github.com/kycaid/android-sdk/releases) section.*
 
 > **Important Warning for Google Play Distribution:** Do not use the `nongms` variant for apps distributed through the Google Play Store. Because this standalone version is designed to dynamically download executable native libraries (`.so` files) from a remote server at runtime to minimize the initial APK size, it violates Google Play's Device and Network Abuse policy regarding downloading executable code. Publishing an app with this variant to Google Play risks immediate rejection or app suspension.
-
-> **Emulator Compatibility Note:** The `nongms` variant may crash when run on Android emulators. Because this version dynamically loads native `.so` files at runtime, architecture mismatches (e.g., x86/x86_64 vs. ARM) on virtual devices can prevent these libraries from initializing correctly. It is highly recommended to test the non-GMS variant exclusively on physical Android devices.
 
 3. **Size Optimization (Non-GMS only).** Because the `kycaid-sdk-nongms` variant bundles the ML models and native binaries, you must exclude unused assets and `.so` libraries to prevent inflating your final `.apk` size. Add the following configuration to the `android` block in your module's `build.gradle` file to strip out these files and drastically reduce the size impact:
 
