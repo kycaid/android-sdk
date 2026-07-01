@@ -11,6 +11,10 @@
     - [Handle verification Result](#handle-verification-result)
     - [Get verification status](#get-verification-status)
     - [Additional configuration](#additional-configuration)
+* [NFC document verification](#nfc-document-verification)
+    - [Add the NFC dependency](#add-the-nfc-dependency)
+    - [Configure packaging](#configure-packaging)
+    - [Enable NFC feature](#enable-nfc-feature)
 * [Analytics](#analytics)
 * [UI customization](#ui-customization)
 * [Screenshots](#screenshots)
@@ -219,7 +223,7 @@ data class VerificationState(
 )
 
 enum class VerificationStatus {
-    PENDING, APPROVED, DECLINED
+    PENDING, APPROVED, DECLINED, CUSTOMER_PENDING
 }
 
 data class Verification(
@@ -297,6 +301,66 @@ In case you want to delegate closing the verification `Activity` to a customer, 
 config
     .showsCompleteButton(true) // false by default
 ```
+
+## NFC document verification
+
+If your verification form includes documents with an embedded RFID chip (biometric passports and some ID cards), the SDK can read that chip over NFC and cross-check the data on the chip against the recognised document. This gives you a much stronger guarantee that the document is genuine and hasn't been tampered with.
+
+NFC verification module is shipped as a separate `kycaid-sdk-nfc` dependency that supplements the main SDK. It's optional: if you don't add and enable it, the SDK simply runs the verification flow without the NFC step. This keeps your app size unaffected unless you actually opt in — the NFC module and its dependencies are only pulled in when you add the `kycaid-sdk-nfc` dependency.
+
+> NFC reading only works on a physical device with NFC hardware. It is not available on emulators.
+
+### Add the NFC dependency
+
+Add the NFC dependency to your app's `build.gradle` alongside the main SDK dependency. It's served from the same maven repository and released in lockstep with the main SDK, so use the same version.
+```kotlin
+val kycaid_version = "year.month.major.minor"
+implementation("com.kycaid:kycaid-sdk:$kycaid_version")
+implementation("com.kycaid:kycaid-sdk-nfc:$kycaid_version")
+```
+> The `kycaid-sdk-nfc` dependency does not transitively pull in the main SDK, so you must declare both dependencies explicitly. Replace `year.month.major.minor` with the latest version available in the GitHub [Releases](https://github.com/kycaid/android-sdk/releases) section.
+
+The NFC module declares the `android.permission.NFC` permission and the `android.hardware.nfc` feature (as not required) in its manifest, so they are merged into your app automatically — you don't need to add them yourself.
+
+### Configure packaging
+
+The NFC module depends on passport-reading libraries (`jmrtd`, `scuba`, BouncyCastle) that bundle overlapping `META-INF` metadata files. Unless these are excluded, packaging your `.apk` can fail with duplicate-file merge errors. Add the following to the `android` block of your module's `build.gradle`:
+```gradle
+packagingOptions {
+    resources {
+        excludes += ['META-INF/LICENSE*', 'META-INF/NOTICE*', 'META-INF/versions/**']
+    }
+}
+```
+or for Kotlin DSL (build.gradle.kts):
+```Kotlin
+packaging {
+    resources {
+        excludes.addAll(arrayOf("META-INF/LICENSE*", "META-INF/NOTICE*", "META-INF/versions/**"))
+    }
+}
+```
+
+### Enable NFC feature
+
+The main SDK module doesn't contain the NFC feature on its own. To enable it, call `KycaidNfc.init()` once before you start a verification — `Application.onCreate()` is a good place:
+```kotlin
+class MyApplication : Application() {
+
+    override fun onCreate() {
+        super.onCreate()
+        KycaidNfc.init()
+    }
+}
+```
+Once initialized, whenever the verification flow reaches a document that has an NFC chip, the SDK automatically offers the NFC scanning step. If you skip this call, the SDK keeps working normally but without NFC reading.
+
+> Note: the NFC scanning step is shown only when **all** of the following hold:
+> - NFC verification is enabled for the document step of your form on the [Dashboard](https://app.kycaid.com/dashboard);
+> - the recognised document actually has a readable NFC chip;
+> - the `kycaid-sdk-nfc` dependency is added, `KycaidNfc.init()` is called, and the packaging configuration above is in place.
+>
+> If any of these is missing, the verification flow continues normally, just without the NFC step.
 
 ## Analytics
 
@@ -514,6 +578,38 @@ data class DropdownColors(
     /** The stroke color of the focused dropdown button. */
     @ColorInt val focusedStrokeColor: Int = COLOR_UNSPECIFIED,
 )
+
+@Serializable
+data class MultiSelectColors(
+    /**
+     * Colors of the multi-select trigger view (the view that opens the options list).
+     * Mirrors the dropdown trigger styling.
+     * Each value defaults to the matching `DropdownColors` value unless explicitly specified.
+     */
+    val trigger: DropdownColors = DropdownColors(),
+
+    /** Colors of the selected option tags shown below the trigger view. */
+    val tag: TagColors = TagColors(),
+) {
+
+    @Serializable
+    data class TagColors(
+        /** The background color of a selected option tag. */
+        @ColorInt val backgroundColor: Int = COLOR_UNSPECIFIED,
+
+        /**
+         * The stroke color of a selected option tag.
+         * Defaults to `ColorScheme.primaryColor` unless explicitly specified.
+         */
+        @ColorInt val strokeColor: Int = COLOR_UNSPECIFIED,
+
+        /**
+         * The color of text and the remove icon inside a selected option tag.
+         * Defaults to `ColorScheme.primaryColor` unless explicitly specified.
+         */
+        @ColorInt val textColor: Int = COLOR_UNSPECIFIED,
+    )
+}
 
 @Serializable
 data class RadioButtonColors(
